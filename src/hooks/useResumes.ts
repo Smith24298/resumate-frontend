@@ -12,7 +12,7 @@ interface UseResumesResult {
   deleteResume: (id: string) => Promise<void>;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 function mapResume(document: any): Resume {
   const createdAt = document.createdAt || document.created_at || document.$createdAt || new Date().toISOString();
