@@ -23,41 +23,41 @@ createRoot(document.getElementById("root")!).render(
   >
     <BrowserRouter>
       <App />
-      <Toaster 
+      <Toaster
         position="bottom-center"
         toastOptions={{
           style: {
-            background: 'rgba(22,27,34,0.95)',
-            border: '1px solid rgba(34,211,160,0.3)',
-            color: '#22d3a0',
-            padding: '11px 20px',
-            borderRadius: '10px',
-            fontSize: '13px',
+            background: "rgba(22,27,34,0.95)",
+            border: "1px solid rgba(34,211,160,0.3)",
+            color: "#22d3a0",
+            padding: "11px 20px",
+            borderRadius: "10px",
+            fontSize: "13px",
             fontWeight: 500,
-            fontFamily: 'DM Sans, sans-serif',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-            backdropFilter: 'blur(20px)',
+            fontFamily: "DM Sans, sans-serif",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+            backdropFilter: "blur(20px)",
           },
           success: {
             style: {
-              background: 'rgba(22,27,34,0.95)',
-              border: '1px solid rgba(34,211,160,0.3)',
-              color: '#22d3a0',
+              background: "rgba(22,27,34,0.95)",
+              border: "1px solid rgba(34,211,160,0.3)",
+              color: "#22d3a0",
             },
             iconTheme: {
-              primary: '#22d3a0',
-              secondary: 'rgba(22,27,34,0.95)',
+              primary: "#22d3a0",
+              secondary: "rgba(22,27,34,0.95)",
             },
           },
           error: {
             style: {
-              background: 'rgba(30,10,15,0.95)',
-              border: '1px solid rgba(255,94,126,0.3)',
-              color: '#ff5e7e',
+              background: "rgba(30,10,15,0.95)",
+              border: "1px solid rgba(255,94,126,0.3)",
+              color: "#ff5e7e",
             },
             iconTheme: {
-              primary: '#ff5e7e',
-              secondary: 'rgba(30,10,15,0.95)',
+              primary: "#ff5e7e",
+              secondary: "rgba(30,10,15,0.95)",
             },
           },
         }}
