@@ -14,7 +14,13 @@ if (!publishableKey) {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <ClerkProvider publishableKey={publishableKey ?? ""}>
+  <ClerkProvider
+    publishableKey={publishableKey ?? ""}
+    signInForceRedirectUrl="/dashboard"
+    signUpForceRedirectUrl="/dashboard"
+    signInFallbackRedirectUrl="/dashboard"
+    signUpFallbackRedirectUrl="/dashboard"
+  >
     <BrowserRouter>
       <App />
       <Toaster 
