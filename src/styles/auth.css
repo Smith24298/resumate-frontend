@@ -1,0 +1,274 @@
+@layer components {
+  .rm-auth-shell {
+    background: #f8fafc;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 28px 20px;
+  }
+
+  .rm-auth-frame {
+    width: min(1080px, 100%);
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+  }
+
+  .rm-auth-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 640px;
+  }
+
+  .rm-auth-formPane {
+    position: relative;
+    background: #ffffff;
+    padding: 44px 44px 38px;
+    display: grid;
+    align-content: center;
+    transition: transform 0.5s ease;
+    will-change: transform;
+    z-index: 2;
+  }
+
+  .rm-auth-overlayPane {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.08), rgba(59, 130, 246, 0.08));
+    transition: transform 0.5s ease;
+    will-change: transform;
+    z-index: 1;
+  }
+
+  .rm-auth-overlayPane::before {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    background:
+      radial-gradient(800px 520px at 70% 35%, rgba(30, 64, 175, 0.22), transparent 60%),
+      radial-gradient(700px 520px at 20% 70%, rgba(59, 130, 246, 0.14), transparent 62%),
+      linear-gradient(180deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 1));
+    filter: saturate(1);
+    transform: translateZ(0);
+  }
+
+  .rm-auth-overlayPane::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(circle at 60% 35%, black 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .rm-auth-overlayContent {
+    position: relative;
+    height: 100%;
+    display: grid;
+    align-content: center;
+    gap: 14px;
+    padding: 44px;
+    color: var(--rm-text);
+  }
+
+  /* Slide swap: login => form left, signup => form right */
+  .rm-auth[data-mode="signup"] .rm-auth-formPane {
+    transform: translateX(100%);
+  }
+
+  .rm-auth[data-mode="signup"] .rm-auth-overlayPane {
+    transform: translateX(-100%);
+  }
+
+  .rm-auth-title {
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: #0f172a;
+  }
+
+  .rm-auth-subtitle {
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #64748b;
+  }
+
+  .rm-auth-logoRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .rm-auth-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .rm-auth-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    border: 1px solid #dbeafe;
+    display: grid;
+    place-items: center;
+    background: #eff6ff;
+    box-shadow: none;
+    color: #1e40af;
+    font-weight: 750;
+    letter-spacing: -0.03em;
+  }
+
+  .rm-auth-socialRow {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .rm-auth-socialBtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    display: grid;
+    place-items: center;
+    color: #475569;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .rm-auth-socialBtn:hover {
+    transform: translateY(-2px);
+    border-color: #bfdbfe;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  }
+
+  .rm-auth-fadeIn {
+    animation: rmAuthFade 520ms ease both;
+  }
+
+  .rm-auth-input {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    transition: all 0.2s ease;
+  }
+
+  .rm-auth-input:focus {
+    border-color: #1e40af !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 0 0 2px rgba(30, 64, 175, 0.16);
+  }
+
+  .rm-auth-overlayCta {
+    border: 1px solid #bfdbfe;
+    background: #ffffff;
+    color: #1e40af;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  }
+
+  .rm-auth-overlayCta:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.1);
+  }
+
+  .rm-auth-atsBadge {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    padding: 10px 12px;
+    border-radius: 16px;
+    border: 1px solid #bbf7d0;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow:
+      0 18px 40px rgba(15, 23, 42, 0.08);
+    animation: rmAtsPulse 2.6s ease-in-out infinite;
+  }
+
+  @keyframes rmAtsPulse {
+
+    0%,
+    100% {
+      transform: translateY(0);
+      filter: drop-shadow(0 0 0 rgba(34, 197, 94, 0));
+    }
+
+    50% {
+      transform: translateY(-2px);
+      filter: drop-shadow(0 0 14px rgba(34, 197, 94, 0.22));
+    }
+  }
+
+  @keyframes rmAuthFade {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Sliding “overlay” feel (subtle, premium) */
+  .rm-auth-slider {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    transition: transform 0.5s ease;
+    will-change: transform;
+  }
+
+  .rm-auth[data-mode="signup"] .rm-auth-slider {
+    transform: translateX(-50%);
+  }
+
+  .rm-auth-panel {
+    display: grid;
+    align-content: center;
+    padding: 44px;
+  }
+
+  .rm-auth-panel--form {
+    background: #ffffff;
+  }
+
+  .rm-auth-panel--overlay {
+    background: transparent;
+  }
+
+  @media (max-width: 1024px) {
+    .rm-auth-inner {
+      grid-template-columns: 1fr;
+      min-height: unset;
+    }
+
+    .rm-auth-overlayPane {
+      display: none;
+    }
+
+    .rm-auth-formPane {
+      padding: 36px 22px 30px;
+      transform: none !important;
+    }
+  }
+}
