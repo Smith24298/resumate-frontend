@@ -12,7 +12,8 @@ interface UseResumesResult {
   deleteResume: (id: string) => Promise<void>;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const RAW_API_BASE = import.meta.env.VITE_API_BASE_URL?.trim();
+const API_BASE = (RAW_API_BASE || "http://localhost:4000").replace(/\/+$/, "");
 
 function mapResume(document: any): Resume {
   const createdAt = document.createdAt || document.created_at || document.$createdAt || new Date().toISOString();
@@ -31,32 +32,56 @@ function mapResume(document: any): Resume {
 }
 
 export function useResumes(_userId: string): UseResumesResult {
-  const { getToken } = useAuth();
+  const { getToken, isLoaded, userId: authUserId } = useAuth();
+  const userId = _userId || authUserId || "";
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
 
   const authFetch = useCallback(
     async (path: string, init?: RequestInit) => {
+      if (!isLoaded) {
+        throw new Error("Authentication is not ready");
+      }
+
       const token = await getToken();
+      if (!token) {
+        throw new Error("Missing authentication token");
+      }
+
       const headers: Record<string, string> = {
         ...(init?.headers instanceof Headers
           ? Object.fromEntries(init.headers)
           : (init?.headers as Record<string, string>) || {}),
       };
 
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
+      headers.Authorization = `Bearer ${token}`;
 
-      return fetch(`${API_BASE}${path}`, {
+      const requestInit: RequestInit = {
         ...init,
         headers,
-      });
+      };
+
+      try {
+        return await fetch(`${API_BASE}${path}`, requestInit);
+      } catch (error) {
+        // Dev fallback when backend runs on HTTP and env is set to HTTPS localhost.
+        const httpLocalhostBase = API_BASE.replace(/^https:\/\/localhost/i, "http://localhost");
+        if (httpLocalhostBase !== API_BASE) {
+          return fetch(`${httpLocalhostBase}${path}`, requestInit);
+        }
+        throw error;
+      }
     },
-    [getToken],
+    [getToken, isLoaded],
   );
 
   const fetchResumes = useCallback(async () => {
+    if (!isLoaded || !userId) {
+      setResumes([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await authFetch("/api/resumes");
@@ -74,7 +99,7 @@ export function useResumes(_userId: string): UseResumesResult {
     } finally {
       setLoading(false);
     }
-  }, [authFetch]);
+  }, [authFetch, isLoaded, userId]);
 
   useEffect(() => {
     void fetchResumes();

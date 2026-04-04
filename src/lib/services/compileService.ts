@@ -1,10 +1,33 @@
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const RAW_API_BASE = (
+  (import.meta as ImportMeta & { env?: { VITE_API_BASE_URL?: string } }).env?.VITE_API_BASE_URL
+)?.trim();
+const API_BASE = (RAW_API_BASE || 'http://localhost:4000').replace(/\/+$/, '');
+
+async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
+  try {
+    return await fetch(`${API_BASE}${path}`, init);
+  } catch (error) {
+    const httpLocalhostBase = API_BASE.replace(/^https:\/\/localhost/i, 'http://localhost');
+    if (httpLocalhostBase !== API_BASE) {
+      return fetch(`${httpLocalhostBase}${path}`, init);
+    }
+    throw error;
+  }
+}
 
 interface CompileResponse {
   pdfUrl?: string;
   error?: string;
   line?: number;
+}
+
+function formatCompileErrorMessage(rawMessage: string): string {
+  if (/Cannot POST \/?/i.test(rawMessage)) {
+    return 'Compile provider is misconfigured on the backend. Set LATEX_API_URL to a valid compile endpoint (usually ending with /compile).';
+  }
+
+  return rawMessage;
 }
 
 /**
@@ -19,7 +42,7 @@ export async function compileResume(
   if (!token) throw new Error('No auth token');
 
   try {
-    const response = await fetch(`${API_BASE}/api/compile`, {
+    const response = await apiFetch('/api/compile', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -29,13 +52,21 @@ export async function compileResume(
     });
 
     if (response.status === 422) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Compilation failed');
+      const errorData = (await response.json().catch(async () => {
+        const text = await response.text().catch(() => '');
+        return { error: text };
+      })) as CompileResponse;
+
+      throw new Error(
+        formatCompileErrorMessage(errorData.error || 'Compilation failed'),
+      );
     }
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(`Compilation error: ${response.status} ${text}`);
+      throw new Error(
+        formatCompileErrorMessage(`Compilation error: ${response.status} ${text}`),
+      );
     }
 
     const blob = await response.blob();
