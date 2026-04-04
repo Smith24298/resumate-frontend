@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { UserButton } from "@clerk/clerk-react";
 import clsx from "clsx";
 import {
   LayoutDashboard,
@@ -19,17 +20,6 @@ interface SidebarProps {
 }
 
 const SIDEBAR_COLLAPSED_KEY = "resumate.sidebar.collapsed";
-
-function getInitials(name: string, fallback: string) {
-  const cleaned = name.trim();
-  if (!cleaned) return fallback.slice(0, 2).toUpperCase();
-
-  return cleaned
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() || "")
-    .join("");
-}
 
 const navItems = [
   {
@@ -118,16 +108,12 @@ function NavItem({ item, isActive, collapsed, onClick }: NavItemProps) {
 }
 
 interface SidebarCollapsedProps {
-  firstName: string;
-  email: string;
   activeItemId: string;
   onToggle: () => void;
   onNavigate: (path: string) => void;
 }
 
 function SidebarCollapsed({
-  firstName,
-  email,
   activeItemId,
   onToggle,
   onNavigate,
@@ -182,14 +168,17 @@ function SidebarCollapsed({
           </span>
         </button>
 
-        <div className="group relative flex h-11 w-11 items-center justify-center rounded-full transition-transform duration-200 hover:scale-105">
-          <div className="grid h-10 w-10 place-items-center overflow-hidden rounded-full border border-slate-200 bg-white">
-            <div className="grid h-full w-full place-items-center bg-gradient-to-br from-blue-500 to-indigo-600 text-[11px] font-bold text-white">
-              {getInitials(firstName, email || "RM")}
-            </div>
-          </div>
+        <div className="group relative flex h-11 w-11 items-center justify-center rounded-full transition-transform duration-200">
+          <UserButton
+            afterSignOutUrl="/"
+            appearance={{
+              elements: {
+                userButtonAvatarBox: "h-10 w-10 border border-slate-200",
+              },
+            }}
+          />
           <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 opacity-0 shadow-lg transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
-            {firstName || email || "Profile"}
+            Manage profile
           </span>
         </div>
       </div>
@@ -228,8 +217,6 @@ export function Sidebar({ firstName, email }: SidebarProps) {
   if (collapsed) {
     return (
       <SidebarCollapsed
-        firstName={firstName}
-        email={email}
         activeItemId={activeItemId}
         onToggle={() => setCollapsed(false)}
         onNavigate={(path) => navigate(path)}
@@ -271,10 +258,15 @@ export function Sidebar({ firstName, email }: SidebarProps) {
       <div className="px-3 pt-4">
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
           <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center overflow-hidden rounded-full border border-slate-200 bg-white">
-              <div className="grid h-full w-full place-items-center bg-gradient-to-br from-blue-500 to-indigo-600 text-[11px] font-bold text-white">
-                {getInitials(firstName, email || "RM")}
-              </div>
+            <div className="shrink-0">
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "h-10 w-10 border border-slate-200",
+                  },
+                }}
+              />
             </div>
             <div className="min-w-0">
               <div className="truncate text-sm font-medium text-slate-900">
@@ -301,21 +293,6 @@ export function Sidebar({ firstName, email }: SidebarProps) {
       </nav>
 
       <div className="border-t border-slate-200 px-3 py-3 space-y-3">
-        <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-blue-700">
-            Upgrade to Pro
-          </p>
-          <p className="mt-2 text-xs leading-5 text-slate-600">
-            Unlock smarter ATS suggestions, templates, and faster exports.
-          </p>
-          <button
-            type="button"
-            className="mt-3 w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-[0_10px_22px_rgba(37,99,235,0.18)]"
-          >
-            Upgrade
-          </button>
-        </div>
-
         <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] text-slate-500">
           Toggle sidebar: Ctrl + B
         </div>

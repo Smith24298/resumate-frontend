@@ -57,11 +57,11 @@ export function ResumeCard({
 
   return (
     <article
-      className={`group relative flex w-full cursor-pointer items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-2.5 py-2 shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-[0_8px_20px_rgba(37,99,235,0.08)] ${isTop ? "ring-2 ring-emerald-200" : ""} ${dimLow ? "opacity-95" : ""} ${className ?? ""}`}
+      className={`group relative flex w-full cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-[0_8px_20px_rgba(37,99,235,0.08)] ${isTop ? "ring-2 ring-emerald-200" : ""} ${dimLow ? "opacity-95" : ""} ${className ?? ""}`}
       onClick={onEdit}
     >
-      <div className="relative grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blue-50 ring-1 ring-blue-100">
-        <FileText className="h-3.5 w-3.5 text-blue-700" />
+      <div className="relative grid h-8 w-8 shrink-0 place-items-center rounded-full bg-blue-50 ring-1 ring-blue-100">
+        <FileText className="h-4 w-4 text-blue-700" />
         {isTop ? (
           <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-emerald-700">
             Top
@@ -87,10 +87,10 @@ export function ResumeCard({
         </div>
       </div>
 
-      <div className="relative grid h-9 w-9 shrink-0 place-items-center">
+      <div className="relative grid h-10 w-10 shrink-0 place-items-center">
         <div className="absolute inset-0 animate-[spin_12s_linear_infinite] rounded-full border border-slate-200" />
         <div
-          className={`relative grid size-9 place-items-center rounded-full border ${scoreTone}`}
+          className={`relative grid size-10 place-items-center rounded-full border ${scoreTone}`}
         >
           <div className="text-[7px] uppercase tracking-[0.1em] text-current/70">
             ATS
@@ -105,7 +105,7 @@ export function ResumeCard({
           e.stopPropagation();
           onEdit();
         }}
-        className="rounded-md border border-blue-200 bg-[#eff6ff] px-2 py-1.5 text-[10px] font-semibold text-blue-800 transition-all duration-150 hover:bg-blue-50"
+        className="rounded-md border border-blue-200 bg-[#eff6ff] px-2.5 py-1.5 text-[10px] font-semibold text-blue-800 transition-all duration-150 hover:bg-blue-50"
       >
         Edit
       </button>
@@ -118,7 +118,7 @@ export function ResumeCard({
         <button
           type="button"
           onClick={() => setShowMenu((prev) => !prev)}
-          className="grid h-7 w-7 place-items-center rounded-md border border-slate-200 bg-slate-50 text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900"
+          className="grid h-8 w-8 place-items-center rounded-md border border-slate-200 bg-slate-50 text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900"
           aria-label="Open resume actions"
         >
           <MoreVertical className="h-3.5 w-3.5" />
