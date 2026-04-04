@@ -38,6 +38,8 @@ export interface ATSAnalysisResponse {
   success: boolean;
   data?: ATSAnalysisResult;
   error?: string;
+  status?: number;
+  retryAfterSeconds?: number;
 }
 
 interface RawATSAnalysisResult {
@@ -57,6 +59,18 @@ interface RawATSAnalysisResult {
     projects?: number;
     education?: number;
   };
+}
+
+function mapAtsError(status: number, upstreamMessage?: string): string {
+  if (status === 429) {
+    return "ATS is receiving too many requests. Please wait a few seconds and try again.";
+  }
+
+  if (status === 502 || status === 503 || status === 504) {
+    return "ATS service is temporarily unavailable. Please retry shortly.";
+  }
+
+  return upstreamMessage || `API Error: ${status}`;
 }
 
 function normalizeATSResult(raw: RawATSAnalysisResult): ATSAnalysisResult {
@@ -153,9 +167,16 @@ export async function analyzeResumeFromFile(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      const retryAfterRaw = response.headers.get("retry-after");
+      const retryAfterSeconds = retryAfterRaw ? Number(retryAfterRaw) : undefined;
       return {
         success: false,
-        error: errorData.error || `API Error: ${response.status}`,
+        status: response.status,
+        retryAfterSeconds:
+          typeof retryAfterSeconds === "number" && Number.isFinite(retryAfterSeconds)
+            ? retryAfterSeconds
+            : undefined,
+        error: mapAtsError(response.status, errorData.error),
       };
     }
 
@@ -215,9 +236,16 @@ export async function analyzeResumeFromText(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      const retryAfterRaw = response.headers.get("retry-after");
+      const retryAfterSeconds = retryAfterRaw ? Number(retryAfterRaw) : undefined;
       return {
         success: false,
-        error: errorData.error || `API Error: ${response.status}`,
+        status: response.status,
+        retryAfterSeconds:
+          typeof retryAfterSeconds === "number" && Number.isFinite(retryAfterSeconds)
+            ? retryAfterSeconds
+            : undefined,
+        error: mapAtsError(response.status, errorData.error),
       };
     }
 

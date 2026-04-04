@@ -33,6 +33,7 @@ export function ATSPanel({
   const [analysis, setAnalysis] = useState<ATSAnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [cooldownUntil, setCooldownUntil] = useState<number>(0);
   const [resultCache, setResultCache] = useState<
     Record<string, ATSAnalysisResult>
   >({});
@@ -52,6 +53,13 @@ export function ATSPanel({
 
   const manualRetry = async () => {
     if (!resumeContent || loading) return;
+    const now = Date.now();
+    if (cooldownUntil > now) {
+      const seconds = Math.max(1, Math.ceil((cooldownUntil - now) / 1000));
+      setError(`Please wait ${seconds}s before retrying ATS analysis.`);
+      return;
+    }
+
     if (resumeContent.length < 50) {
       setAnalysis(null);
       setError("Resume content is too short for ATS analysis.");
@@ -79,8 +87,16 @@ export function ATSPanel({
       setAnalysis(response.data);
       setResultCache((prev) => ({ ...prev, [cacheKey]: response.data! }));
       onScoreChange?.(response.data.atsScore);
+      setCooldownUntil(0);
     } else {
       setError(response.error || "Failed to analyze resume");
+
+      if (response.status === 429) {
+        const retrySeconds = response.retryAfterSeconds ?? 20;
+        setCooldownUntil(Date.now() + retrySeconds * 1000);
+      } else if (response.status === 502 || response.status === 503 || response.status === 504) {
+        setCooldownUntil(Date.now() + 10000);
+      }
     }
 
     setLoading(false);
@@ -246,18 +262,18 @@ export function ATSPanel({
             {analysis.suggestions
               .slice(0, 3)
               .map((suggestion: string, idx: number) => (
-              <div
-                key={idx}
-                className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-slate-700"
-              >
-                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-blue-600 text-[11px] font-bold text-white">
-                  {idx + 1}
-                </span>
-                <p className="leading-5">
-                  {suggestion.substring(0, 80)}
-                  {suggestion.length > 80 ? "…" : ""}
-                </p>
-              </div>
+                <div
+                  key={idx}
+                  className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-slate-700"
+                >
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-blue-600 text-[11px] font-bold text-white">
+                    {idx + 1}
+                  </span>
+                  <p className="leading-5">
+                    {suggestion.substring(0, 80)}
+                    {suggestion.length > 80 ? "…" : ""}
+                  </p>
+                </div>
               ))}
           </div>
         </div>
@@ -265,11 +281,13 @@ export function ATSPanel({
 
       <button
         onClick={manualRetry}
-        disabled={loading || isCompiling}
+        disabled={loading || isCompiling || cooldownUntil > Date.now()}
         className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 disabled:opacity-50 border border-blue-200 rounded text-blue-700 text-sm font-medium transition-colors"
       >
         <RefreshCw className="w-3.5 h-3.5" />
-        Recalculate
+        {cooldownUntil > Date.now()
+          ? `Retry in ${Math.max(1, Math.ceil((cooldownUntil - Date.now()) / 1000))}s`
+          : "Recalculate"}
       </button>
 
       <p className="text-xs text-slate-500 text-center">
