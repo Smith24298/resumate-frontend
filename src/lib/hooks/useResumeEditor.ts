@@ -1,6 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { Resume } from '../types/resume';
 import {
   fetchResume,
   updateResume as updateResumeApi,
@@ -32,6 +31,10 @@ export interface UseResumeEditorResult {
   handleDownload: () => Promise<void>;
   handleDownloadTex: () => Promise<void>;
   handleCompile: () => Promise<void>;
+  autoCompileEnabled: boolean;
+  autoCompileIntervalMs: number;
+  setAutoCompileEnabled: (enabled: boolean) => void;
+  setAutoCompileIntervalMs: (intervalMs: number) => void;
   isInitialized: boolean;
   notFound: boolean;
 }
@@ -47,6 +50,10 @@ export function useResumeEditor(
   const { upsertResume } = useResumeStore();
   const [isInitialized, setIsInitialized] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [autoCompileEnabled, setAutoCompileEnabled] = useState(false);
+  const [autoCompileIntervalMs, setAutoCompileIntervalMs] = useState(15000);
+  const lastCompiledContentRef = useRef('');
+  const currentPdfUrlRef = useRef<string | null>(null);
 
   const [state, setState] = useState<EditorState>({
     resumeId,
@@ -104,11 +111,14 @@ export function useResumeEditor(
       try {
         const blob = await compileResumeApi(contentToCompile, getToken);
         const url = createPdfUrl(blob);
+
         setState((prev) => ({
           ...prev,
           pdfUrl: url,
           isCompiling: false,
+          compileError: null,
         }));
+        lastCompiledContentRef.current = contentToCompile;
       } catch (err) {
         setState((prev) => ({
           ...prev,
@@ -137,6 +147,55 @@ export function useResumeEditor(
   const handleCompile = useCallback(async () => {
     await triggerCompile(state.content);
   }, [triggerCompile, state.content]);
+
+  const updateAutoCompileInterval = useCallback((intervalMs: number) => {
+    const nextInterval = Math.max(5000, Math.min(120000, intervalMs));
+    setAutoCompileIntervalMs(nextInterval);
+  }, []);
+
+  useEffect(() => {
+    if (!autoCompileEnabled) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      if (!isInitialized) return;
+      if (notFound) return;
+
+      const trimmedContent = state.content.trim();
+      if (!trimmedContent) return;
+      if (state.isCompiling) return;
+      if (trimmedContent === lastCompiledContentRef.current) return;
+
+      void triggerCompile(trimmedContent);
+    }, autoCompileIntervalMs);
+
+    return () => window.clearInterval(intervalId);
+  }, [
+    autoCompileEnabled,
+    autoCompileIntervalMs,
+    isInitialized,
+    notFound,
+    state.content,
+    state.isCompiling,
+    triggerCompile,
+  ]);
+
+  useEffect(() => {
+    if (state.pdfUrl && currentPdfUrlRef.current && currentPdfUrlRef.current !== state.pdfUrl) {
+      revokePdfUrl(currentPdfUrlRef.current);
+    }
+
+    currentPdfUrlRef.current = state.pdfUrl;
+  }, [state.pdfUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (currentPdfUrlRef.current) {
+        revokePdfUrl(currentPdfUrlRef.current);
+      }
+    };
+  }, []);
 
   // Handle save (PUT only, never creates)
   const handleSave = useCallback(async () => {
@@ -212,6 +271,10 @@ export function useResumeEditor(
     handleDownload,
     handleDownloadTex,
     handleCompile,
+    autoCompileEnabled,
+    autoCompileIntervalMs,
+    setAutoCompileEnabled,
+    setAutoCompileIntervalMs: updateAutoCompileInterval,
     isInitialized,
     notFound,
   };

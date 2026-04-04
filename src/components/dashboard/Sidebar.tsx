@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UserButton } from "@clerk/clerk-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import {
   LayoutDashboard,
@@ -20,11 +20,38 @@ interface SidebarProps {
 
 const SIDEBAR_COLLAPSED_KEY = "resumate.sidebar.collapsed";
 
+function getInitials(name: string, fallback: string) {
+  const cleaned = name.trim();
+  if (!cleaned) return fallback.slice(0, 2).toUpperCase();
+
+  return cleaned
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("");
+}
+
 const navItems = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "resumes", label: "Resumes", icon: FileText },
-  { id: "ai-tools", label: "AI Tools", icon: Sparkles, future: true },
-  { id: "ats-analyzer", label: "ATS Analyzer", icon: ScanSearch, future: true },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    path: "/dashboard",
+  },
+  { id: "resumes", label: "Resumes", icon: FileText, path: "/dashboard" },
+  {
+    id: "ai-tools",
+    label: "AI Tools",
+    icon: Sparkles,
+    path: "/dashboard",
+    future: true,
+  },
+  {
+    id: "ats-analyzer",
+    label: "ATS Analyzer",
+    icon: ScanSearch,
+    path: "/ats-analyzer",
+  },
 ];
 
 type NavItemDef = (typeof navItems)[number];
@@ -33,14 +60,16 @@ interface NavItemProps {
   item: NavItemDef;
   isActive: boolean;
   collapsed: boolean;
+  onClick: () => void;
 }
 
-function NavItem({ item, isActive, collapsed }: NavItemProps) {
+function NavItem({ item, isActive, collapsed, onClick }: NavItemProps) {
   const Icon = item.icon;
 
   return (
     <button
       type="button"
+      onClick={onClick}
       aria-label={item.label}
       title={collapsed ? item.label : undefined}
       className={clsx(
@@ -93,6 +122,7 @@ interface SidebarCollapsedProps {
   email: string;
   activeItemId: string;
   onToggle: () => void;
+  onNavigate: (path: string) => void;
 }
 
 function SidebarCollapsed({
@@ -100,9 +130,11 @@ function SidebarCollapsed({
   email,
   activeItemId,
   onToggle,
+  onNavigate,
 }: SidebarCollapsedProps) {
   return (
-    <aside className="hidden lg:flex w-[70px] min-h-screen sticky top-0 flex-col items-center justify-between border-r border-slate-200 bg-white transition-[width] duration-300 ease-in-out">
+    <aside className="hidden lg:flex w-[62px] min-h-screen sticky top-0 flex-col items-center justify-between border-r border-slate-200 bg-white transition-[width] duration-300 ease-in-out relative overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500" />
       <div className="flex w-full flex-col items-center gap-5 px-2 py-4">
         <button
           type="button"
@@ -126,11 +158,16 @@ function SidebarCollapsed({
             item={item}
             isActive={activeItemId === item.id}
             collapsed
+            onClick={() => onNavigate(item.path)}
           />
         ))}
       </nav>
 
       <div className="flex w-full flex-col items-center gap-4 px-2 py-4">
+        <div className="rounded-2xl border border-blue-100 bg-blue-50 px-2 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-blue-700 shadow-sm">
+          Pro
+        </div>
+
         <button
           type="button"
           className="group relative flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 transition-all duration-200 hover:text-slate-900"
@@ -147,7 +184,9 @@ function SidebarCollapsed({
 
         <div className="group relative flex h-11 w-11 items-center justify-center rounded-full transition-transform duration-200 hover:scale-105">
           <div className="grid h-10 w-10 place-items-center overflow-hidden rounded-full border border-slate-200 bg-white">
-            <UserButton afterSignOutUrl="/" />
+            <div className="grid h-full w-full place-items-center bg-gradient-to-br from-blue-500 to-indigo-600 text-[11px] font-bold text-white">
+              {getInitials(firstName, email || "RM")}
+            </div>
           </div>
           <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 opacity-0 shadow-lg transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
             {firstName || email || "Profile"}
@@ -159,6 +198,8 @@ function SidebarCollapsed({
 }
 
 export function Sidebar({ firstName, email }: SidebarProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
@@ -180,7 +221,9 @@ export function Sidebar({ firstName, email }: SidebarProps) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const activeItemId = "dashboard";
+  const activeItemId =
+    navItems.find((item) => location.pathname.startsWith(item.path))?.id ||
+    "dashboard";
 
   if (collapsed) {
     return (
@@ -189,12 +232,14 @@ export function Sidebar({ firstName, email }: SidebarProps) {
         email={email}
         activeItemId={activeItemId}
         onToggle={() => setCollapsed(false)}
+        onNavigate={(path) => navigate(path)}
       />
     );
   }
 
   return (
-    <aside className="hidden lg:flex sticky top-0 min-h-screen flex-col border-r border-slate-200 bg-white transition-[width] duration-300 ease-in-out w-[260px]">
+    <aside className="hidden lg:flex sticky top-0 min-h-screen flex-col border-r border-slate-200 bg-white transition-[width] duration-300 ease-in-out w-[224px] relative overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500" />
       <div className="border-b border-slate-200 px-3 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -227,7 +272,9 @@ export function Sidebar({ firstName, email }: SidebarProps) {
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
           <div className="flex items-center gap-3">
             <div className="grid h-10 w-10 place-items-center overflow-hidden rounded-full border border-slate-200 bg-white">
-              <UserButton afterSignOutUrl="/" />
+              <div className="grid h-full w-full place-items-center bg-gradient-to-br from-blue-500 to-indigo-600 text-[11px] font-bold text-white">
+                {getInitials(firstName, email || "RM")}
+              </div>
             </div>
             <div className="min-w-0">
               <div className="truncate text-sm font-medium text-slate-900">
@@ -248,11 +295,27 @@ export function Sidebar({ firstName, email }: SidebarProps) {
             item={item}
             isActive={activeItemId === item.id}
             collapsed={false}
+            onClick={() => navigate(item.path)}
           />
         ))}
       </nav>
 
-      <div className="border-t border-slate-200 px-3 py-3">
+      <div className="border-t border-slate-200 px-3 py-3 space-y-3">
+        <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 shadow-sm">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-blue-700">
+            Upgrade to Pro
+          </p>
+          <p className="mt-2 text-xs leading-5 text-slate-600">
+            Unlock smarter ATS suggestions, templates, and faster exports.
+          </p>
+          <button
+            type="button"
+            className="mt-3 w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-[0_10px_22px_rgba(37,99,235,0.18)]"
+          >
+            Upgrade
+          </button>
+        </div>
+
         <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] text-slate-500">
           Toggle sidebar: Ctrl + B
         </div>

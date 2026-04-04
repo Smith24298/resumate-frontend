@@ -16,7 +16,7 @@ export function Footer() {
         <div className="flex items-center gap-2.5">
           <div
             style={{
-              background: "#1e40af",
+              background: "linear-gradient(135deg, #2563eb, #7c3aed)",
             }}
             className="w-7 h-7 rounded-lg flex items-center justify-center"
           >
@@ -25,7 +25,7 @@ export function Footer() {
           <span
             style={{
               color: "#0f172a",
-              fontFamily: "Inter, Poppins, sans-serif",
+              fontFamily: "var(--rm-sans)",
               fontSize: "15px",
               fontWeight: 600,
             }}
@@ -42,7 +42,7 @@ export function Footer() {
               href="#"
               style={{
                 color: "#64748b",
-                fontFamily: "Inter, Poppins, sans-serif",
+                fontFamily: "var(--rm-sans)",
                 fontSize: "13px",
               }}
               className="hover:text-slate-900 transition-colors duration-200"
@@ -79,7 +79,7 @@ export function Footer() {
         <p
           style={{
             color: "#64748b",
-            fontFamily: "Inter, Poppins, sans-serif",
+            fontFamily: "var(--rm-sans)",
             fontSize: "12px",
             textAlign: "center",
           }}

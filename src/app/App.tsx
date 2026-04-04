@@ -7,6 +7,7 @@ import { AuthPanel } from "./Auth/AuthPanel";
 import { ProtectedDashboard } from "./pages/ProtectedDashboard";
 import { EditorPageWrapper } from "./pages/EditorPageWrapper";
 import { ClerkOAuthComplete } from "./pages/ClerkOAuthComplete";
+import { ProtectedAtsAnalyzer } from "./pages/ProtectedAtsAnalyzer";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/dashboard" element={<ProtectedDashboard />} />
+      <Route path="/ats-analyzer" element={<ProtectedAtsAnalyzer />} />
       <Route path="/editor/:id" element={<EditorPageWrapper />} />
       <Route path="/auth/complete" element={<ClerkOAuthComplete />} />
       <Route path="*" element={<Navigate to="/" replace />} />

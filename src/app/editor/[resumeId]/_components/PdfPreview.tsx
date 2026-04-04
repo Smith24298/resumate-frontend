@@ -77,14 +77,15 @@ export function PdfPreview({
         </div>
         <div className="flex items-center gap-3">
           <div
-            className="px-2 py-1 rounded text-xs font-medium"
+            className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-medium"
             style={{
-              background: "#eff6ff",
-              color: "#1e40af",
+              background: "#ecfdf5",
+              color: "#15803d",
               fontFamily: "Inter, Poppins, sans-serif",
-              border: "1px solid #bfdbfe",
+              border: "1px solid #bbf7d0",
             }}
           >
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             Live
           </div>
         </div>
@@ -125,7 +126,7 @@ export function PdfPreview({
           </div>
         )}
 
-        {pdfUrl && !compileError && (
+        {pdfUrl && (
           <iframe
             src={pdfUrl}
             className="w-full h-full border-none"
@@ -134,7 +135,7 @@ export function PdfPreview({
           />
         )}
 
-        {!pdfUrl && !isCompiling && !compileError && (
+        {!pdfUrl && !isCompiling && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="text-4xl mb-4" style={{ opacity: 0.25 }}>

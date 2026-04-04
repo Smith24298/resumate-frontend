@@ -14,18 +14,38 @@ export type EditorViewMode = "split" | "code" | "preview";
 
 interface EditorTopBarProps {
   title: string;
+  contentLength: number;
   atsScore: number;
   isSaving: boolean;
   isCompiling: boolean;
+  autoCompileEnabled: boolean;
+  autoCompileIntervalMs: number;
   viewMode: EditorViewMode;
   onViewModeChange: (mode: EditorViewMode) => void;
   onSave: () => Promise<void>;
   onDownload: () => Promise<void>;
   onDownloadTex: () => Promise<void>;
   onCompile: () => Promise<void>;
+  onAutoCompileEnabledChange: (enabled: boolean) => void;
+  onAutoCompileIntervalChange: (intervalMs: number) => void;
 }
 
-function AtsScorePill({ score }: { score: number }) {
+const AUTO_COMPILE_INTERVAL_OPTIONS = [
+  { value: 5000, label: "5s" },
+  { value: 10000, label: "10s" },
+  { value: 15000, label: "15s" },
+  { value: 30000, label: "30s" },
+  { value: 60000, label: "60s" },
+  { value: 120000, label: "120s" },
+];
+
+function AtsScorePill({
+  score,
+  isCompiling,
+}: {
+  score: number;
+  isCompiling: boolean;
+}) {
   const getScoreTier = (value: number) => {
     if (value >= 80)
       return {
@@ -53,9 +73,24 @@ function AtsScorePill({ score }: { score: number }) {
 
   return (
     <div
-      className="flex items-center gap-2 px-3 py-1.5 rounded-full border"
-      style={{ backgroundColor: tier.bg, borderColor: tier.border }}
+      className={`flex items-center gap-2 rounded-full border px-3 py-1.5 transition-transform duration-200 ${isCompiling ? "animate-pulse" : ""}`}
+      style={{
+        backgroundColor: tier.bg,
+        borderColor: tier.border,
+        boxShadow: `0 0 0 1px ${tier.border}, 0 10px 24px rgba(37,99,235,0.08)`,
+      }}
     >
+      {isCompiling ? (
+        <Loader2
+          className="h-3.5 w-3.5 animate-spin"
+          style={{ color: tier.color }}
+        />
+      ) : (
+        <span
+          className="h-2.5 w-2.5 rounded-full"
+          style={{ background: tier.color, boxShadow: `0 0 0 6px ${tier.bg}` }}
+        />
+      )}
       <span
         className="text-[12px] font-semibold"
         style={{ color: tier.color, fontWeight: 700 }}
@@ -81,8 +116,8 @@ function ViewModeToggle({
 
   return (
     <div
-      className="inline-flex items-center gap-1 rounded-lg p-1"
-      style={{ background: "#f1f5f9", border: "1px solid #e2e8f0" }}
+      className="inline-flex items-center gap-1 rounded-full p-1"
+      style={{ background: "#eff6ff", border: "1px solid #dbeafe" }}
       role="tablist"
       aria-label="Editor view mode"
     >
@@ -94,7 +129,7 @@ function ViewModeToggle({
             onClick={() => onChange(mode.key)}
             className="transition-all duration-200"
             style={{
-              borderRadius: "8px",
+              borderRadius: "9999px",
               padding: "6px 10px",
               fontSize: "12px",
               fontWeight: 600,
@@ -116,15 +151,20 @@ function ViewModeToggle({
 
 export function EditorTopBar({
   title,
+  contentLength,
   atsScore,
   isSaving,
   isCompiling,
+  autoCompileEnabled,
+  autoCompileIntervalMs,
   viewMode,
   onViewModeChange,
   onSave,
   onDownload,
   onDownloadTex,
   onCompile,
+  onAutoCompileEnabledChange,
+  onAutoCompileIntervalChange,
 }: EditorTopBarProps) {
   const navigate = useNavigate();
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">(
@@ -273,6 +313,21 @@ export function EditorTopBar({
             {getSaveStatusText()}
           </div>
         </div>
+
+        <div className="hidden md:block ml-4 min-w-[220px]">
+          <div className="mb-1 flex items-center justify-between text-[11px] uppercase tracking-[0.14em] text-slate-500">
+            <span>Character count</span>
+            <span>{contentLength.toLocaleString()}</span>
+          </div>
+          <div className="h-1.5 overflow-hidden rounded-full bg-blue-100">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 transition-all duration-300"
+              style={{
+                width: `${Math.min(100, Math.max(12, (contentLength / 5000) * 100))}%`,
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="hidden lg:flex flex-1 justify-center">
@@ -280,7 +335,50 @@ export function EditorTopBar({
       </div>
 
       <div className="flex items-center gap-3 flex-wrap justify-end">
-        <AtsScorePill score={atsScore} />
+        <AtsScorePill score={atsScore} isCompiling={isCompiling} />
+
+        <div
+          className="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5"
+          style={{ border: "1px solid #dbe3ee", background: "#ffffff" }}
+        >
+          <label
+            className="inline-flex items-center gap-2"
+            style={{ fontSize: "12px", color: "#334155", fontWeight: 600 }}
+          >
+            <input
+              type="checkbox"
+              checked={autoCompileEnabled}
+              onChange={(event) =>
+                onAutoCompileEnabledChange(event.target.checked)
+              }
+              style={{ accentColor: "#1e40af", cursor: "pointer" }}
+            />
+            Auto Compile
+          </label>
+
+          <select
+            value={autoCompileIntervalMs}
+            onChange={(event) =>
+              onAutoCompileIntervalChange(Number(event.target.value))
+            }
+            disabled={!autoCompileEnabled}
+            aria-label="Auto compile interval"
+            style={{
+              fontSize: "12px",
+              padding: "4px 6px",
+              borderRadius: "6px",
+              border: "1px solid #cbd5e1",
+              background: autoCompileEnabled ? "#ffffff" : "#f1f5f9",
+              color: autoCompileEnabled ? "#0f172a" : "#64748b",
+            }}
+          >
+            {AUTO_COMPILE_INTERVAL_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div
           className="w-px"

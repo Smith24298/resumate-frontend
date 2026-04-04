@@ -2,9 +2,9 @@ import { Quote } from "lucide-react";
 import { useState } from "react";
 
 const stats = [
-  { value: "500+", label: "Resumes Generated" },
-  { value: "92%", label: "Average ATS Score" },
-  { value: "20+", label: "Colleges Represented" },
+  { value: "10,000+", label: "Resumes Created" },
+  { value: "89%", label: "Average ATS Score" },
+  { value: "4.8/5", label: "User Rating" },
 ];
 
 const testimonials = [
@@ -73,9 +73,12 @@ export function SocialProof() {
           </h2>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-16 mb-14">
+        <div className="flex flex-wrap justify-center gap-5 mb-14">
           {stats.map((s) => (
-            <div key={s.label} className="text-center">
+            <div
+              key={s.label}
+              className="text-center rounded-2xl border border-blue-100 bg-white/80 px-6 py-5 shadow-sm backdrop-blur"
+            >
               <div
                 style={{
                   fontFamily: "Inter, Poppins, sans-serif",
@@ -225,6 +228,20 @@ export function SocialProof() {
                       {t.school}
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-4 flex items-center gap-2">
+                  {Array.from({ length: 5 }).map((_, avatarIndex) => (
+                    <div
+                      key={avatarIndex}
+                      className="grid h-8 w-8 place-items-center rounded-full border border-white bg-blue-100 text-[10px] font-semibold text-blue-700"
+                    >
+                      {String.fromCharCode(65 + avatarIndex)}
+                    </div>
+                  ))}
+                  <span className="text-xs text-slate-500">
+                    Trusted by 10,000+ job seekers
+                  </span>
                 </div>
               </div>
             );

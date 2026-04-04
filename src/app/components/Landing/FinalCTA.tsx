@@ -2,7 +2,7 @@ export function FinalCTA() {
   return (
     <section
       style={{
-        backgroundColor: "#f8fafc",
+        backgroundColor: "#f5f9ff",
         paddingTop: "94px",
         paddingBottom: "94px",
       }}
@@ -75,28 +75,28 @@ export function FinalCTA() {
 
         <button
           style={{
-            background: "#1e40af",
+            background: "linear-gradient(135deg, #2563eb, #7c3aed)",
             color: "white",
-            fontFamily: "Inter, Poppins, sans-serif",
+            fontFamily: "var(--rm-sans)",
             fontSize: "16px",
             fontWeight: 600,
             padding: "15px 34px",
             borderRadius: "10px",
             border: "none",
             cursor: "pointer",
-            boxShadow: "0 10px 20px rgba(30,64,175,0.2)",
-            transition: "transform 0.15s ease, background 0.15s ease",
+            boxShadow: "0 14px 30px rgba(37,99,235,0.24)",
+            transition: "transform 0.15s ease, box-shadow 0.15s ease",
             letterSpacing: "-0.01em",
           }}
           onMouseEnter={(e) => {
             const el = e.currentTarget as HTMLButtonElement;
             el.style.transform = "translateY(-2px)";
-            el.style.background = "#1d4ed8";
+            el.style.boxShadow = "0 20px 42px rgba(37,99,235,0.32)";
           }}
           onMouseLeave={(e) => {
             const el = e.currentTarget as HTMLButtonElement;
             el.style.transform = "translateY(0)";
-            el.style.background = "#1e40af";
+            el.style.boxShadow = "0 14px 30px rgba(37,99,235,0.24)";
           }}
         >
           Build Your Resume Now →

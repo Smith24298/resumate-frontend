@@ -8,9 +8,9 @@ export function ProtectedDashboard() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-[#0B0F1A] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#f5f9ff] text-blue-700 flex items-center justify-center">
         <div
-          className="animate-spin h-8 w-8 rounded-full border-2 border-white/20 border-t-white"
+          className="animate-spin h-8 w-8 rounded-full border-2 border-blue-200 border-t-blue-600"
           aria-label="Loading dashboard"
         />
       </div>

@@ -2,25 +2,26 @@
 
 :root {
   --font-size: 16px;
-  /* Resumate design system (dark-first) */
-  --rm-bg: #0b0f1a;
-  --rm-bg-alt: #0e1424;
-  --rm-card: #121826;
+  --rm-sans: "Plus Jakarta Sans", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  /* Resumate design system (light blue) */
+  --rm-bg: #f5f9ff;
+  --rm-bg-alt: #edf4ff;
+  --rm-card: #ffffff;
 
-  --rm-text: #e5e7eb;
-  --rm-text-secondary: #9ca3af;
-  --rm-text-muted: #6b7280;
+  --rm-text: #0f172a;
+  --rm-text-secondary: #334155;
+  --rm-text-muted: #64748b;
 
-  --rm-indigo-1: #6366f1;
-  --rm-indigo-2: #4f46e5;
-  --rm-green: #22c55e;
+  --rm-indigo-1: #2563eb;
+  --rm-indigo-2: #1d4ed8;
+  --rm-green: #0ea5e9;
 
-  --rm-border: rgba(255, 255, 255, 0.08);
+  --rm-border: rgba(37, 99, 235, 0.16);
 
-  --rm-glow-indigo: 0 0 0 1px rgba(99, 102, 241, 0.08),
-    0 0 28px rgba(99, 102, 241, 0.18);
-  --rm-glow-green: 0 0 0 1px rgba(34, 197, 94, 0.10),
-    0 0 28px rgba(34, 197, 94, 0.18);
+  --rm-glow-indigo: 0 0 0 1px rgba(37, 99, 235, 0.14),
+    0 0 28px rgba(37, 99, 235, 0.18);
+  --rm-glow-green: 0 0 0 1px rgba(14, 165, 233, 0.14),
+    0 0 28px rgba(14, 165, 233, 0.18);
 
   --background: var(--rm-bg);
   --foreground: var(--rm-text);
@@ -30,22 +31,22 @@
   --popover-foreground: var(--rm-text);
   --primary: var(--rm-indigo-1);
   --primary-foreground: #ffffff;
-  --secondary: rgba(99, 102, 241, 0.12);
+  --secondary: rgba(37, 99, 235, 0.10);
   --secondary-foreground: var(--rm-text);
-  --muted: rgba(148, 163, 184, 0.10);
+  --muted: rgba(37, 99, 235, 0.08);
   --muted-foreground: var(--rm-text-secondary);
-  --accent: rgba(99, 102, 241, 0.12);
+  --accent: rgba(37, 99, 235, 0.12);
   --accent-foreground: var(--rm-text);
   --destructive: #d4183d;
   --destructive-foreground: #ffffff;
   --border: var(--rm-border);
   --input: transparent;
-  --input-background: rgba(14, 20, 36, 0.75);
-  --switch-background: rgba(255, 255, 255, 0.16);
+  --input-background: rgba(255, 255, 255, 0.96);
+  --switch-background: rgba(37, 99, 235, 0.22);
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   /* Used by shadcn focus-visible ring utilities */
-  --ring: rgba(99, 102, 241, 0.75);
+  --ring: rgba(37, 99, 235, 0.65);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -63,13 +64,13 @@
 }
 
 .dark {
-  /* Keep parity with dark-first defaults */
+  /* Keep parity with current light defaults */
   --background: var(--rm-bg);
   --foreground: var(--rm-text);
   --card: var(--rm-card);
   --card-foreground: var(--rm-text);
   --border: var(--rm-border);
-  --ring: rgba(99, 102, 241, 0.75);
+  --ring: rgba(37, 99, 235, 0.65);
 }
 
 @theme inline {
@@ -120,8 +121,9 @@
 
   body {
     @apply bg-background text-foreground;
-    background: radial-gradient(circle at top right, #1a1f3a, #0b0f1a 60%);
-    color-scheme: dark;
+    font-family: var(--rm-sans);
+    background: radial-gradient(circle at top right, #e0ecff, #f5f9ff 60%);
+    color-scheme: light;
   }
 
   /**

@@ -46,15 +46,16 @@ export function Navbar() {
             alignItems: "center",
             justifyContent: "space-between",
             gap: "14px",
-            backgroundColor: "rgba(255,255,255,0.95)",
-            backdropFilter: "blur(8px)",
-            border: "1px solid #e2e8f0",
-            borderRadius: "12px",
+            backgroundColor: "rgba(255,255,255,0.88)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(191,219,254,0.9)",
+            borderRadius: "16px",
             padding: "10px 14px 10px 16px",
             boxShadow: scrolled
-              ? "0 10px 28px rgba(15,23,42,0.12)"
-              : "0 4px 14px rgba(15,23,42,0.08)",
-            transition: "box-shadow 0.2s ease",
+              ? "0 14px 34px rgba(37,99,235,0.12)"
+              : "0 6px 18px rgba(15,23,42,0.06)",
+            transition: "box-shadow 0.2s ease, transform 0.2s ease",
+            transform: scrolled ? "translateY(2px)" : "translateY(0)",
           }}
         >
           <div
@@ -146,14 +147,15 @@ export function Navbar() {
               <Link
                 to="/signup"
                 style={{
-                  background: "#1e40af",
+                  background: "linear-gradient(135deg, #2563eb, #7c3aed)",
                   color: "#ffffff",
                   textDecoration: "none",
-                  fontFamily: "Inter, Poppins, sans-serif",
+                  fontFamily: "var(--rm-sans)",
                   fontSize: "14px",
                   fontWeight: 600,
                   padding: "9px 14px",
                   borderRadius: "9px",
+                  boxShadow: "0 10px 24px rgba(37,99,235,0.22)",
                 }}
               >
                 Create Resume
@@ -170,14 +172,15 @@ export function Navbar() {
                 <Link
                   to="/dashboard"
                   style={{
-                    background: "#1e40af",
+                    background: "linear-gradient(135deg, #2563eb, #7c3aed)",
                     color: "#ffffff",
                     textDecoration: "none",
-                    fontFamily: "Inter, Poppins, sans-serif",
+                    fontFamily: "var(--rm-sans)",
                     fontSize: "14px",
                     fontWeight: 600,
                     padding: "9px 14px",
                     borderRadius: "9px",
+                    boxShadow: "0 10px 24px rgba(37,99,235,0.22)",
                   }}
                 >
                   Dashboard

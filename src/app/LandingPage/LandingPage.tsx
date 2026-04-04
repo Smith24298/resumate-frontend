@@ -37,10 +37,11 @@ function FadeSection({
 export function LandingPage() {
   return (
     <div
+      className="rm-noise-bg"
       style={{
-        backgroundColor: "#f8fafc",
+        backgroundColor: "#f5f9ff",
         minHeight: "100vh",
-        fontFamily: "Inter, Poppins, sans-serif",
+        fontFamily: "var(--rm-sans)",
       }}
     >
       <Navbar />

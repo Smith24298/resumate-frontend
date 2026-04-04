@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -7,12 +7,30 @@ type PreviewMode = "resume" | "letter";
 export function Hero() {
   const navigate = useNavigate();
   const [activePreview, setActivePreview] = useState<PreviewMode>("resume");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setMounted(true), 120);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const titleWords = [
+    "Build",
+    "a",
+    "professional",
+    "resume",
+    "that",
+    "gets",
+    "shortlisted",
+    "faster.",
+  ];
 
   return (
     <section
       id="hero-section"
       style={{
-        background: "linear-gradient(135deg, #f8fafc 0%, #f0f4f9 100%)",
+        background:
+          "radial-gradient(circle at 20% 20%, rgba(37,99,235,0.14), transparent 32%), radial-gradient(circle at 80% 20%, rgba(124,58,237,0.10), transparent 28%), linear-gradient(135deg, #f8fbff 0%, #eef4ff 55%, #f8fafc 100%)",
         minHeight: "92vh",
         borderBottom: "1px solid #e2e8f0",
         position: "relative",
@@ -20,6 +38,23 @@ export function Hero() {
       }}
       className="flex items-center"
     >
+      <div className="rm-glow-hero" style={{ top: "-10%", right: "-10%" }} />
+
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "radial-gradient(rgba(37,99,235,0.08) 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+          maskImage:
+            "linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.1) 70%, transparent)",
+          pointerEvents: "none",
+          opacity: 0.45,
+        }}
+      />
+
       {/* Subtle background shape */}
       <div
         style={{
@@ -58,16 +93,29 @@ export function Hero() {
 
             <h1
               style={{
-                fontFamily: "Inter, Poppins, sans-serif",
+                fontFamily: "var(--rm-sans)",
                 color: "#0f172a",
-                fontSize: "clamp(34px, 5vw, 54px)",
+                fontSize: "clamp(56px, 6vw, 64px)",
                 lineHeight: 1.1,
-                fontWeight: 750,
+                fontWeight: 800,
                 letterSpacing: "-0.03em",
                 marginBottom: "14px",
               }}
             >
-              Build a professional resume that gets shortlisted faster.
+              {titleWords.map((word, index) => (
+                <span
+                  key={word + index}
+                  style={{
+                    display: "inline-block",
+                    marginRight: "0.18em",
+                    opacity: mounted ? 1 : 0,
+                    transform: mounted ? "translateY(0)" : "translateY(16px)",
+                    transition: `opacity 420ms ease ${index * 45}ms, transform 420ms ease ${index * 45}ms`,
+                  }}
+                >
+                  {word}
+                </span>
+              ))}
             </h1>
 
             <p
@@ -87,18 +135,19 @@ export function Hero() {
               <button
                 onClick={() => navigate("/dashboard")}
                 style={{
-                  fontFamily: "Inter, Poppins, sans-serif",
-                  background: "#1e40af",
+                  fontFamily: "var(--rm-sans)",
+                  background: "linear-gradient(135deg, #2563eb, #7c3aed)",
                   color: "#ffffff",
-                  border: "1px solid #1e40af",
-                  borderRadius: "10px",
+                  border: "1px solid rgba(37,99,235,0.26)",
+                  borderRadius: "12px",
                   padding: "13px 20px",
                   fontSize: "17px",
                   fontWeight: 600,
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "8px",
-                  transition: "background 180ms ease",
+                  transition: "transform 180ms ease, box-shadow 180ms ease",
+                  boxShadow: "0 16px 38px rgba(37,99,235,0.24)",
                 }}
               >
                 Create Resume
@@ -108,19 +157,39 @@ export function Hero() {
               <a
                 href="#how-it-works"
                 style={{
-                  fontFamily: "Inter, Poppins, sans-serif",
-                  color: "#1e293b",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "10px",
+                  fontFamily: "var(--rm-sans)",
+                  color: "#1d4ed8",
+                  border: "1px solid rgba(191,219,254,0.9)",
+                  borderRadius: "12px",
                   padding: "13px 20px",
                   fontSize: "17px",
                   fontWeight: 500,
                   textDecoration: "none",
-                  background: "#ffffff",
+                  background: "rgba(255,255,255,0.72)",
+                  backdropFilter: "blur(10px)",
                 }}
               >
                 See How It Works
               </a>
+            </div>
+
+            <div className="mb-6 flex items-center gap-4">
+              <div className="flex -space-x-2">
+                {["A", "M", "S", "L", "R"].map((initials, index) => (
+                  <div
+                    key={`${initials}-${index}`}
+                    className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-blue-100 text-[11px] font-semibold text-blue-700"
+                  >
+                    {initials}
+                  </div>
+                ))}
+              </div>
+              <p
+                className="text-sm text-slate-600"
+                style={{ fontFamily: "var(--rm-sans)" }}
+              >
+                Trusted by 10,000+ job seekers
+              </p>
             </div>
 
             <div
@@ -140,7 +209,7 @@ export function Hero() {
                 <div key={item.label}>
                   <p
                     style={{
-                      fontFamily: "Inter, Poppins, sans-serif",
+                      fontFamily: "var(--rm-sans)",
                       color: "#0f172a",
                       fontSize: "20px",
                       fontWeight: 700,
@@ -151,7 +220,7 @@ export function Hero() {
                   </p>
                   <p
                     style={{
-                      fontFamily: "Inter, Poppins, sans-serif",
+                      fontFamily: "var(--rm-sans)",
                       color: "#64748b",
                       fontSize: "14px",
                       margin: "2px 0 0",
@@ -178,8 +247,30 @@ export function Hero() {
                 borderRadius: "16px",
                 padding: "32px 24px",
                 backdropFilter: "blur(8px)",
+                transform: "rotate(-2deg)",
+                boxShadow: "0 24px 70px rgba(37,99,235,0.12)",
               }}
             >
+              <div
+                style={{
+                  position: "absolute",
+                  top: "-14px",
+                  left: "32px",
+                  background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                  color: "#ffffff",
+                  borderRadius: "9999px",
+                  padding: "8px 14px",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  boxShadow: "0 12px 24px rgba(34,197,94,0.22)",
+                  zIndex: 4,
+                }}
+              >
+                ATS Optimized ✓
+              </div>
+
               {/* Deep background layer */}
               <div
                 style={{

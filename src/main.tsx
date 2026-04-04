@@ -24,40 +24,40 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <App />
       <Toaster
-        position="bottom-center"
+        position="bottom-right"
         toastOptions={{
           style: {
-            background: "rgba(22,27,34,0.95)",
-            border: "1px solid rgba(34,211,160,0.3)",
-            color: "#22d3a0",
+            background: "rgba(255,255,255,0.96)",
+            border: "1px solid rgba(37,99,235,0.25)",
+            color: "#1d4ed8",
             padding: "11px 20px",
             borderRadius: "10px",
             fontSize: "13px",
             fontWeight: 500,
-            fontFamily: "DM Sans, sans-serif",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+            fontFamily: "Plus Jakarta Sans, Inter, sans-serif",
+            boxShadow: "0 8px 28px rgba(37,99,235,0.14)",
             backdropFilter: "blur(20px)",
           },
           success: {
             style: {
-              background: "rgba(22,27,34,0.95)",
-              border: "1px solid rgba(34,211,160,0.3)",
-              color: "#22d3a0",
+              background: "rgba(255,255,255,0.96)",
+              border: "1px solid rgba(14,165,233,0.25)",
+              color: "#0369a1",
             },
             iconTheme: {
-              primary: "#22d3a0",
-              secondary: "rgba(22,27,34,0.95)",
+              primary: "#0369a1",
+              secondary: "#ffffff",
             },
           },
           error: {
             style: {
-              background: "rgba(30,10,15,0.95)",
+              background: "rgba(255,255,255,0.96)",
               border: "1px solid rgba(255,94,126,0.3)",
               color: "#ff5e7e",
             },
             iconTheme: {
               primary: "#ff5e7e",
-              secondary: "rgba(30,10,15,0.95)",
+              secondary: "#ffffff",
             },
           },
         }}
