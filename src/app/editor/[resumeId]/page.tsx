@@ -426,7 +426,7 @@ export default function EditorPage({
             isCompiling={state.isCompiling}
             onScoreChange={(score) => {
               setLiveAtsScore(score);
-              handleAtsScoreChange(score);
+              void handleAtsScoreChange(score);
             }}
           />
         </div>

@@ -18,7 +18,7 @@ async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
 }
 
 interface UpdateResumePayload {
-  content: string;
+  content?: string;
   atsScore: number;
 }
 

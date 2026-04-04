@@ -27,7 +27,7 @@ export interface EditorState {
 export interface UseResumeEditorResult {
   state: EditorState;
   handleContentChange: (newContent: string) => void;
-  handleAtsScoreChange: (score: number) => void;
+  handleAtsScoreChange: (score: number) => Promise<void>;
   handleSave: () => Promise<void>;
   handleDownload: () => Promise<void>;
   handleDownloadTex: () => Promise<void>;
@@ -144,13 +144,40 @@ export function useResumeEditor(
     []
   );
 
-  const handleAtsScoreChange = useCallback((score: number) => {
+  const handleAtsScoreChange = useCallback(async (score: number) => {
     const safeScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
+
     setState((prev) => ({
       ...prev,
       atsScore: safeScore,
     }));
-  }, []);
+
+    if (!isInitialized || notFound) {
+      return;
+    }
+
+    if (safeScore === state.atsScore) {
+      return;
+    }
+
+    try {
+      const updated = await updateResumeApi(
+        resumeId,
+        { atsScore: safeScore },
+        getToken,
+      );
+
+      setState((prev) => ({
+        ...prev,
+        atsScore: updated.atsScore ?? safeScore,
+        lastSavedAt: updated.updatedAt ? new Date(updated.updatedAt) : prev.lastSavedAt,
+      }));
+
+      upsertResume(updated);
+    } catch (error) {
+      console.error("Failed to persist ATS score", error);
+    }
+  }, [getToken, isInitialized, notFound, resumeId, state.atsScore, upsertResume]);
 
   // Handle manual compilation
   const handleCompile = useCallback(async () => {
