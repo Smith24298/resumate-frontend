@@ -27,6 +27,7 @@ export interface EditorState {
 export interface UseResumeEditorResult {
   state: EditorState;
   handleContentChange: (newContent: string) => void;
+  handleAtsScoreChange: (score: number) => void;
   handleSave: () => Promise<void>;
   handleDownload: () => Promise<void>;
   handleDownloadTex: () => Promise<void>;
@@ -143,6 +144,14 @@ export function useResumeEditor(
     []
   );
 
+  const handleAtsScoreChange = useCallback((score: number) => {
+    const safeScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
+    setState((prev) => ({
+      ...prev,
+      atsScore: safeScore,
+    }));
+  }, []);
+
   // Handle manual compilation
   const handleCompile = useCallback(async () => {
     await triggerCompile(state.content);
@@ -202,14 +211,11 @@ export function useResumeEditor(
     setState((prev) => ({ ...prev, isSaving: true }));
 
     try {
-      // Mock ATS score for now (random between 60-100)
-      const mockAtsScore = Math.floor(Math.random() * 40) + 60;
-
       const updated = await updateResumeApi(
         resumeId,
         {
           content: state.content,
-          atsScore: mockAtsScore,
+          atsScore: state.atsScore,
         },
         getToken
       );
@@ -217,7 +223,7 @@ export function useResumeEditor(
       setState((prev) => ({
         ...prev,
         isSaving: false,
-        atsScore: mockAtsScore,
+        atsScore: updated.atsScore ?? prev.atsScore,
         lastSavedAt: new Date(),
       }));
 
@@ -227,7 +233,7 @@ export function useResumeEditor(
       setState((prev) => ({ ...prev, isSaving: false }));
       throw new Error((err as Error).message || 'Save failed');
     }
-  }, [resumeId, state.content, getToken, upsertResume]);
+  }, [resumeId, state.content, state.atsScore, getToken, upsertResume]);
 
   // Handle download
   const handleDownload = useCallback(async () => {
@@ -267,6 +273,7 @@ export function useResumeEditor(
   return {
     state,
     handleContentChange,
+    handleAtsScoreChange,
     handleSave,
     handleDownload,
     handleDownloadTex,

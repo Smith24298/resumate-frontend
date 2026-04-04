@@ -24,6 +24,7 @@ export default function EditorPage({
   const {
     state,
     handleContentChange,
+    handleAtsScoreChange,
     handleSave,
     handleDownload,
     handleDownloadTex,
@@ -423,7 +424,10 @@ export default function EditorPage({
           <ATSPanel
             resumeContent={state.content}
             isCompiling={state.isCompiling}
-            onScoreChange={setLiveAtsScore}
+            onScoreChange={(score) => {
+              setLiveAtsScore(score);
+              handleAtsScoreChange(score);
+            }}
           />
         </div>
       </aside>

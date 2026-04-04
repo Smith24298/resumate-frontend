@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { RefreshCw, AlertCircle, CheckCircle, TrendingUp } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
 import { analyzeResumeFromText } from "@/lib/services/atsService";
@@ -9,21 +9,6 @@ interface ATSPanelProps {
   jobDescription?: string;
   isCompiling?: boolean;
   onScoreChange?: (score: number) => void;
-}
-
-// Debounce hook
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-
-  return debouncedValue;
 }
 
 function getScoreColor(score: number) {
@@ -48,12 +33,10 @@ export function ATSPanel({
   const [analysis, setAnalysis] = useState<ATSAnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const [lastHash, setLastHash] = useState("");
   const [resultCache, setResultCache] = useState<
     Record<string, ATSAnalysisResult>
   >({});
 
-  const debouncedContent = useDebounce(resumeContent, 1500);
   const score = analysis?.atsScore ?? 0;
   const scoreState =
     score >= 80 ? "strong" : score >= 60 ? "average" : "needs-work";
@@ -67,48 +50,21 @@ export function ATSPanel({
       .join("");
   };
 
-  // Auto-analyze on content change (debounced)
-  useEffect(() => {
-    if (!debouncedContent || debouncedContent.length < 50) {
+  const manualRetry = async () => {
+    if (!resumeContent || loading) return;
+    if (resumeContent.length < 50) {
       setAnalysis(null);
+      setError("Resume content is too short for ATS analysis.");
       return;
     }
 
-    const performAnalysis = async () => {
-      const cacheKey = await buildCacheKey(debouncedContent, jobDescription);
-      setLastHash(cacheKey);
-
-      if (resultCache[cacheKey]) {
-        setAnalysis(resultCache[cacheKey]);
-        onScoreChange?.(resultCache[cacheKey].atsScore);
-        return;
-      }
-
-      setLoading(true);
+    const cacheKey = await buildCacheKey(resumeContent, jobDescription);
+    if (resultCache[cacheKey]) {
+      setAnalysis(resultCache[cacheKey]);
       setError("");
-
-      const response = await analyzeResumeFromText(
-        debouncedContent,
-        jobDescription,
-        getToken,
-      );
-
-      if (response.success && response.data) {
-        setAnalysis(response.data);
-        setResultCache((prev) => ({ ...prev, [cacheKey]: response.data! }));
-        onScoreChange?.(response.data.atsScore);
-      } else {
-        setError(response.error || "Failed to analyze resume");
-      }
-
-      setLoading(false);
-    };
-
-    performAnalysis();
-  }, [debouncedContent, getToken, jobDescription, onScoreChange, resultCache]);
-
-  const manualRetry = async () => {
-    if (!resumeContent || loading) return;
+      onScoreChange?.(resultCache[cacheKey].atsScore);
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -121,9 +77,7 @@ export function ATSPanel({
 
     if (response.success && response.data) {
       setAnalysis(response.data);
-      if (lastHash) {
-        setResultCache((prev) => ({ ...prev, [lastHash]: response.data! }));
-      }
+      setResultCache((prev) => ({ ...prev, [cacheKey]: response.data! }));
       onScoreChange?.(response.data.atsScore);
     } else {
       setError(response.error || "Failed to analyze resume");
@@ -237,7 +191,7 @@ export function ATSPanel({
             </p>
           </div>
           <div className="flex flex-wrap gap-1">
-            {analysis.matchedKeywords.slice(0, 5).map((keyword) => (
+            {analysis.matchedKeywords.slice(0, 5).map((keyword: string) => (
               <span
                 key={keyword}
                 className="inline-block px-2 py-1 text-xs bg-emerald-50 border border-emerald-200 rounded text-emerald-700"
@@ -263,7 +217,7 @@ export function ATSPanel({
             </p>
           </div>
           <div className="flex flex-wrap gap-1">
-            {analysis.missingKeywords.slice(0, 6).map((keyword) => (
+            {analysis.missingKeywords.slice(0, 6).map((keyword: string) => (
               <span
                 key={keyword}
                 className="inline-block px-2 py-1 text-xs bg-rose-50 border border-rose-200 rounded text-rose-700"
@@ -289,7 +243,9 @@ export function ATSPanel({
             </p>
           </div>
           <div className="space-y-2">
-            {analysis.suggestions.slice(0, 3).map((suggestion, idx) => (
+            {analysis.suggestions
+              .slice(0, 3)
+              .map((suggestion: string, idx: number) => (
               <div
                 key={idx}
                 className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-slate-700"
@@ -302,7 +258,7 @@ export function ATSPanel({
                   {suggestion.length > 80 ? "…" : ""}
                 </p>
               </div>
-            ))}
+              ))}
           </div>
         </div>
       )}
@@ -317,7 +273,7 @@ export function ATSPanel({
       </button>
 
       <p className="text-xs text-slate-500 text-center">
-        Auto-recalculates 1.5s after your last edit
+        ATS analysis runs only when you click Recalculate.
       </p>
     </div>
   );
